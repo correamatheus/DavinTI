@@ -3,6 +3,7 @@ import { Router } from './router.js';
 import { HomeComponent } from './components/home/home.js';
 import { ContactsComponent } from './components/contacts/contacts.js';
 
+
 // Espera o DOM estar completamente carregado para iniciar a aplicação
 document.addEventListener('DOMContentLoaded', function () {
     // Inicializa a aplicação
@@ -15,6 +16,7 @@ function initApp() {
     const routes = [
         { path: '/', component: HomeComponent },
         { path: '/contacts', component: ContactsComponent },
+ 
     ];
 
     // Inicializa o roteador com as rotas e o ID do elemento onde o conteúdo será renderizado
