@@ -8,7 +8,6 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
-
 app.put('/contatos/:id', (req, res) => {
     const contatoId = req.params.id;
     const { nome, idade, numero } = req.body; // Certifique-se de ter o middleware body-parser configurado para poder acessar req.body
@@ -28,6 +27,106 @@ app.put('/contatos/:id', (req, res) => {
         }
     });
 });
+
+app.use(bodyParser.json());
+app.post('/contato', async (req, res) => {
+    const { nome, idade, numero } = req.body;
+
+    try {
+        // Execute a inserção do novo contato na tabela 'contatos'
+        const [contatoResult] = await database.query('INSERT INTO contato (nome, idade) VALUES (?, ?)', [nome, idade]);
+
+        // Log do resultado da consulta
+        console.log('Resultado da inserção de contato:', contatoResult);
+
+        // Verifica se a inserção foi bem-sucedida
+        if (!contatoResult || contatoResult.affectedRows !== 1) {
+            throw new Error('Erro ao inserir contato');
+        }
+
+        const contatoId = contatoResult.insertId;
+
+        // Execute a inserção do telefone associado ao novo contato na tabela 'telefones'
+        await database.query('INSERT INTO telefone (numero, idcontato) VALUES (?, ?)', [numero, contatoId]);
+
+        res.status(201).send('Contato e telefone inseridos com sucesso');
+    } catch (error) {
+        console.error('Erro ao inserir contato e telefone:', error);
+        res.status(500).send('Erro interno do servidor');
+    }
+});
+
+
+
+
+
+
+
+
+
+// app.post('/contato', async (req, res) => {
+//     const { nome, idade, numero } = req.body;
+
+//     // Inicie uma transação
+//     database.beginTransaction(async (err) => {
+//         if (err) {
+//             console.error('Erro ao iniciar transação:', err);
+//             res.status(500).send('Erro interno do servidor');
+//             return;
+//         }
+
+//         try {
+//             // Execute as operações da transação
+//             await insertContatoAndTelefone(nome, idade, numero);
+
+//             // Comite a transação se ambas as inserções foram bem-sucedidas
+//             database.commit((err) => {
+//                 if (err) {
+//                     handleTransactionError(err, res);
+//                     return;
+//                 }
+
+//                 res.status(201).send('Contato e telefone inseridos com sucesso');
+//             });
+//         } catch (error) {
+//             handleTransactionError(error, res);
+//         }
+//     });
+// });
+
+// async function insertContatoAndTelefone(nome, idade, numero) {
+//     return new Promise((resolve, reject) => {
+//         // Insira o novo contato na tabela 'contatos'
+//         const insertContatoSql = 'INSERT INTO contato (nome, idade) VALUES (?, ?)';
+//         database.query(insertContatoSql, [nome, idade], (err, results) => {
+//             if (err) {
+//                 database.rollback(() => reject(err));
+//                 return;
+//             }
+
+//             const contatoId = results.insertId;
+
+//             // Insira o telefone associado ao novo contato na tabela 'telefones'
+//             const insertTelefoneSql = 'INSERT INTO telefone (numero, idcontato) VALUES (?, ?)';
+//             database.query(insertTelefoneSql, [numero, contatoId], (err, results) => {
+//                 if (err) {
+//                     database.rollback(() => reject(err));
+//                     return;
+//                 }
+
+//                 // Ambas as operações foram bem-sucedidas
+//                 resolve();
+//             });
+//         });
+//     });
+// }
+
+// function handleTransactionError(err, res) {
+//     console.error('Erro na transação:', err);
+//     res.status(500).send('Erro interno do servidor');
+// }
+
+
 
 app.get('/contatos', (req, res) => {
     const sql = `
