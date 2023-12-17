@@ -56,14 +56,6 @@ app.post('/contato', async (req, res) => {
     }
 });
 
-
-
-
-
-
-
-
-
 // app.post('/contato', async (req, res) => {
 //     const { nome, idade, numero } = req.body;
 
@@ -126,61 +118,68 @@ app.post('/contato', async (req, res) => {
 //     res.status(500).send('Erro interno do servidor');
 // }
 
+app.get('/contatos', async (req, res) => {
+    try {
+        const sql = `
+        SELECT 
+            contato.id AS contato_id,
+            contato.nome AS contato_nome,
+            contato.idade AS contato_idade,
+            telefone.numero AS telefone_numero
+        FROM 
+            contato
+        JOIN 
+            telefone ON contato.id = telefone.idcontato;`;
 
+        const results = await database.query(sql, []);
 
-app.get('/contatos', (req, res) => {
-    const sql = `
-    SELECT 
-        contato.id AS contato_id,
-        contato.nome AS contato_nome,
-        contato.idade AS contato_idade,
-        telefone.numero AS telefone_numero
-    FROM 
-        contato
-    JOIN 
-        telefone ON contato.id = telefone.idcontato;`;
+        if (results && results.length > 0) {
+            // Extrai diretamente o primeiro array de resultados
+            const extractedResults = results[0];
 
-    database.query(sql, [], (err, results) => {
-        if (err) {
-            console.error('Erro na consulta:', err);
-            res.status(500).send('Erro interno do servidor');
+            // Agora você pode enviar os resultados extraídos como JSON
+            res.json(extractedResults);
         } else {
-            res.json(results);
+            res.json([]); // ou res.json([]) se preferir enviar um array vazio em caso de nenhum resultado
         }
-    });
+    } catch (error) {
+        console.error('Erro na consulta:', error);
+        res.status(500).send('Erro interno do servidor');
+    }
 });
 
-app.get('/contatos/:id', (req, res) => {
+app.get('/contatos/:id', async (req, res) => {
     const contatoId = req.params.id;
+    try {
+        const sql = `
+            SELECT 
+                contato.id AS contato_id,
+                contato.nome AS contato_nome,
+                contato.idade AS contato_idade,
+                telefone.numero AS telefone_numero
+            FROM 
+                contato
+            JOIN 
+                telefone ON contato.id = telefone.idcontato
+            WHERE 
+                contato.id = ?;`;
 
-    const sql = `
-    SELECT 
-        contato.id AS contato_id,
-        contato.nome AS contato_nome,
-        contato.idade AS contato_idade,
-        telefone.numero AS telefone_numero
-    FROM 
-        contato
-    JOIN 
-        telefone ON contato.id = telefone.idcontato
-    WHERE 
-        contato.id = ?;`;
+        const results = await database.query(sql, [contatoId]);
 
-    database.query(sql, [contatoId], (err, results) => {
-        if (err) {
-            console.error('Erro na consulta:', err);
-            res.status(500).send('Erro interno do servidor');
-        } else if (results.length === 0) {
-            res.status(404).send('Contato não encontrado');
+        if (results && results[0].length > 0) {
+            // Extrai diretamente o primeiro array de resultados
+            const extractedResults = results[0];
+
+            // Agora você pode enviar os resultados extraídos como JSON
+            res.json(extractedResults);
         } else {
-            res.json(results[0]);
+            res.json([]); // ou res.json([]) se preferir enviar um array vazio em caso de nenhum resultado
         }
-    });
+    } catch (error) {
+        console.error('Erro na consulta:', error);
+        res.status(500).send('Erro interno do servidor');
+    }
 });
-
-
-
-
 
 // Middleware para servir todos os arquivos estáticos com o tipo de conteúdo apropriado
 app.use(express.static(path.join(__dirname, '../app'), {

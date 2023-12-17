@@ -43,25 +43,23 @@ document.addEventListener('submit', async function (event) {
 
 export async function HomeComponent() {
   try {
-    const contatos = await getContatos();
-
+    const contatosResponse  = await getContatos();
+    const contatos = contatosResponse.flat();
+    console.log('Contatos recebidos:', contatos);
     const tableRows = contatos.map(contato => `
       <tr>
         <th scope="row">${contato.contato_id}</th>
         <td>${contato.contato_nome}</td>
         <td>${contato.contato_idade}</td>
         <td>${contato.telefone_numero}</td>
-        <td>
-          <button class="btn btn-success">
-            <span class="material-icons">perm_identity</span>
-          </button>
+        <td>          
           <button class="btn btn-danger">
             <span class="material-icons">delete</span>
           </button>
           <button class="btn btn-primary" data-contact-id="${contato.contato_id}">
-          <a style="text-decoration: none; color: white;">
-            <span class="material-icons">edit</span>
-          </a>
+            <a style="text-decoration: none; color: white;">
+              <span class="material-icons">edit</span>
+            </a>
           </button>
         </td>      
       </tr>
@@ -70,6 +68,9 @@ export async function HomeComponent() {
     appContainer.innerHTML = `
       <div class="row">
         <div class="col-md-6">
+        <button class="btn btn-success">
+          <a href="/contacts">Adicionar +</a>
+        </button>
           <table class="table container">
             <thead>
               <tr>
@@ -114,20 +115,21 @@ export async function HomeComponent() {
 async function loadContactDetails(contactId) {
   try {
     const contact = await getContactById(contactId);
+    console.log('Contact:', contact[0]);
     const editContactForm = document.getElementById('editContactForm');
 
     // Atualize o formulário de edição com os detalhes do contato
     editContactForm.innerHTML = `
-      <input type="text" id="editId" hidden value="${contact.contato_id}" required>
+      <input type="text" id="editId" hidden value="${contact[0].contato_id}" required>
 
       <label for="editName">Nome:</label>
-      <input type="text" id="editName" value="${contact.contato_nome}" required>
+      <input type="text" id="editName" value="${contact[0].contato_nome}" required>
 
       <label for="editAge">Idade:</label>
-      <input type="text" id="editAge" value="${contact.contato_idade}" required>
+      <input type="text" id="editAge" value="${contact[0].contato_idade}" required>
 
       <label for="editNumber">Número:</label>
-      <input type="text" id="editNumber" value="${contact.telefone_numero}" required>
+      <input type="text" id="editNumber" value="${contact[0].telefone_numero}" required>
 
       <button type="submit">Salvar Edições</button>
     `;
