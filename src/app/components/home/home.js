@@ -22,6 +22,7 @@ async function getContactById(id) {
 document.addEventListener('DOMContentLoaded', async function () {
   try {
     await HomeComponent();
+
   } catch (e) {
     console.error(e);
   }
@@ -36,13 +37,15 @@ document.addEventListener('submit', async function (event) {
   const contactId = document.getElementById('editId').value;;
 
   await updateContact(contactId, editName, editAge, editNumber);
-
+  
   await HomeComponent();
+  
 });
 
 
 export async function HomeComponent() {
   try {
+   
     const contatosResponse  = await getContatos();
     const contatos = contatosResponse.flat();
     console.log('Contatos recebidos:', contatos);
@@ -53,7 +56,7 @@ export async function HomeComponent() {
         <td>${contato.contato_idade}</td>
         <td>${contato.telefone_numero}</td>
         <td>          
-          <button class="btn btn-danger">
+          <button class="btn btn-danger deleteButton" data-contact-id="${contato.contato_id}">
             <span class="material-icons">delete</span>
           </button>
           <button class="btn btn-primary" data-contact-id="${contato.contato_id}">
@@ -71,6 +74,11 @@ export async function HomeComponent() {
         <button class="btn btn-success">
           <a href="/contacts">Adicionar +</a>
         </button>
+        <div class="d-flex">
+          <input type="text" class="form-control inputPesquisa">
+          <button id="btnFiltrar" class="btn btn-warning">Filtrar</button>
+        </div>
+       
           <table class="table container">
             <thead>
               <tr>
@@ -101,9 +109,29 @@ export async function HomeComponent() {
         await loadContactDetails(contactId);
         
       });
+
+    const deleteButtons = appContainer.querySelectorAll('.deleteButton');
+    deleteButtons.forEach(button => {
+      button.addEventListener('click', async () => {
+        const contactId = button.getAttribute('data-contact-id');
+        console.log(button);
+        console.log(contactId);
+        await deleteContact(contactId);
+      })    
+    });
+
     });
 
 
+    const btnFiltrar = document.getElementById('btnFiltrar');
+    btnFiltrar.addEventListener('click', async () => {
+      const termoPesquisa = document.querySelector('.inputPesquisa').value;
+      if(termoPesquisa){
+        await filterContacts(termoPesquisa);
+      }else {
+        await HomeComponent();
+      }
+    });
   } catch (error) {
     console.error('Erro ao criar componente Home:', error);
   }
@@ -140,22 +168,92 @@ async function loadContactDetails(contactId) {
 
 async function updateContact(id, nome, idade, numero) {
   try {
-      const response = await fetch(`http://localhost:3000/contatos/${id}`, {
-          method: 'PUT',
-          headers: {
-              'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ nome, idade, numero }),
-      });
-
-      if (!response.ok) {
+   
+    const response = await fetch(`http://localhost:3000/contatos/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ nome, idade, numero })
+    });
+    console.log(response);
+    if (!response.ok) {
           throw new Error('Erro ao atualizar contato');
       }
+
   } catch (error) {
       console.error('Erro ao atualizar contato:', error);
       throw error;
   }
 }
+
+async function deleteContact(id) {
+  try {
+    const response = await fetch(`http://localhost:3000/contato/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error('Erro ao excluir contato');
+    }
+
+    const result = await response.json();
+    console.log('Contato excluído com sucesso:', result);
+} catch (error) {
+    console.error('Erro ao excluir contato:', error);
+    throw error;
+}
+}
+
+// document.addEventListener('DOMContentLoaded', async function () {
+//   try {
+//     await HomeComponent();
+
+//     const btnFiltrar = document.getElementById('btnFiltrar');
+//     btnFiltrar.addEventListener('click', async () => {
+//       const termoPesquisa = document.querySelector('.inputPesquisa').value;
+//       await filterContacts(termoPesquisa);
+//     });
+//   } catch (e) {
+//     console.error(e);
+//   }
+// });
+
+
+async function filterContacts(termo) {
+  try {
+    const contatosResponse = await fetch(`http://localhost:3000/contato/filter/${termo}`);
+    const contatos = await contatosResponse.json();
+    console.log("AQUI ESTOU")
+    const tableRows = contatos.map(contato => `
+      <tr>
+        <th scope="row">${contato.contato_id}</th>
+        <td>${contato.contato_nome}</td>
+        <td>${contato.contato_idade}</td>
+        <td>${contato.telefone_numero}</td>
+        <td>          
+          <button class="btn btn-danger deleteButton" data-contact-id="${contato.contato_id}">
+            <span class="material-icons">delete</span>
+          </button>
+          <button class="btn btn-primary" data-contact-id="${contato.contato_id}">
+            <a style="text-decoration: none; color: white;">
+              <span class="material-icons">edit</span>
+            </a>
+          </button>
+        </td>      
+      </tr>
+    `).join('');
+
+    const tbody = document.querySelector('tbody');
+    tbody.innerHTML = tableRows;
+  } catch (error) {
+    console.error('Erro ao filtrar contatos:', error);
+  }
+}
+
 
 
 
