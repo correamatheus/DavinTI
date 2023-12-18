@@ -1,21 +1,66 @@
+import { HomeComponent } from "../home/home.js";
+
 document.addEventListener('submit', async function (event) {
     // Verificar se o evento ocorreu no formulário correto
     if (event.target.id === 'addContactForm') {
         event.preventDefault();
-        console.log("EVENTO");
         const nome = document.getElementById('nome').value;
         const idade = document.getElementById('idade').value;
         const numero = document.getElementById('numero').value;
 
         await addContact(nome, idade, numero);
+        await HomeComponent();
     }
 });
 
 
 export function ContactsComponent() {
     return `
+        <style>
+            #addContactForm {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            }
+            #addContactForm input {
+                border-radius: 8px;
+                background: rgba(68, 68, 68, 0.25);
+                height: 42px;
+                border: none;
+                color: #888;
+                text-align: center;
+                font-family: Sora;
+                font-size: 10px;
+                font-style: normal;
+                font-weight: 400;
+                line-height: 130%;
+            }
+
+            #addContactForm label {
+                color: #BABABA;
+                font-family: Sora;
+                font-size: 12px;
+                font-style: normal;
+                font-weight: 400;
+                line-height: normal;
+            }
+
+            #addContactForm button {
+                flex-shrink: 0;
+                border: none;
+                height: 42px;
+                border-radius: 7px;
+                background: #CFFA61;
+                color: #000;
+                text-align: center;
+                font-family: Sora;
+                font-size: 13px;
+                font-style: normal;
+                font-weight: 400;
+            }
+        </style>
         <h1>Agenda de Contatos</h1>
-        <form id="addContactForm">
+        <form id="addContactForm" class="container">
             <label for="nome">Nome:</label>
             <input type="text" id="nome" required>
 

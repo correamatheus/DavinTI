@@ -177,12 +177,26 @@ export async function HomeComponent() {
           font-weight: 400;
           height: 42px;
           margin-top: 1rem;
-}
+        }
+
+      @media (max-width: 768px) {
+        .container__filtrar {
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        .btn__adicionar {
+          width: 100%;
+        }
+
+        .card__contatos {
+          padding: 8px;
+        }
       }
     </style>
-      <div class="row" style="gap:8px;">
-        <div class="col-md-6 card card__contatos">
-          <div class="d-flex justify-content-between">         
+      <div class="row container-fluid" style="gap:8px; height: 100vh;">
+        <div class="col-md-6 col-sm-12 card card__contatos">
+          <div class="d-flex justify-content-between container__filtrar">         
             <div class="d-flex" style="gap: 8px">
               <input type="text" class="form-control inputPesquisa">
               <button id="btnFiltrar" class="btn btn__filtrar">Filtrar</button>
@@ -204,7 +218,7 @@ export async function HomeComponent() {
             </tbody>
           </table>
         </div>
-        <div class="col-md-4 card card__editar">
+        <div class="col-md-4 col-sm-12 card card__editar">
           <form id="editContactForm" class="d-flex flex-column" style="gap: 8px;">
           </form>
         </div>
@@ -348,7 +362,7 @@ async function filterContacts(termo) {
           <button class="btn btn-danger deleteButton" data-contact-id="${contato.contato_id}">
             <span class="material-icons">delete</span>
           </button>
-          <button class="btn btn-primary" data-contact-id="${contato.contato_id}">
+          <button class="btn btn-primary btn__editar" data-contact-id="${contato.contato_id}">
             <a style="text-decoration: none; color: white;">
               <span class="material-icons">edit</span>
             </a>
