@@ -59,7 +59,7 @@ export async function HomeComponent() {
           <button class="btn btn-danger deleteButton" data-contact-id="${contato.contato_id}">
             <span class="material-icons">delete</span>
           </button>
-          <button class="btn btn-primary" data-contact-id="${contato.contato_id}">
+          <button class="btn btn-primary btn__editar" data-contact-id="${contato.contato_id}">
             <a style="text-decoration: none; color: white;">
               <span class="material-icons">edit</span>
             </a>
@@ -69,33 +69,143 @@ export async function HomeComponent() {
     `).join('');
     const appContainer = document.getElementById('app');
     appContainer.innerHTML = `
-      <div class="row">
-        <div class="col-md-6">
-        <button class="btn btn-success">
-          <a href="/contacts">Adicionar +</a>
-        </button>
-        <div class="d-flex">
-          <input type="text" class="form-control inputPesquisa">
-          <button id="btnFiltrar" class="btn btn-warning">Filtrar</button>
-        </div>
-       
-          <table class="table container">
+    <style>
+      .card__contatos, .card__editar {
+        border-radius: 7px;
+        background: #1C1C1C;
+        padding: 32px;       
+      }
+
+      .contato__th {
+        color: #FFF;
+        font-family: Sora;
+        font-size: 18px;
+        font-style: normal;
+        font-weight: 700;
+        line-height: normal;
+      }
+
+      .contato__tbody {
+        color: #BABABA;
+        font-family: Sora;
+        font-size: 12px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 147%;
+      }
+
+      .btn__adicionar {
+        width: 330px;       
+        flex-shrink: 0;
+        border-radius: 7px;
+        background: #CFFA61;
+        color: #000;
+        text-align: center;
+        font-family: Sora;
+        font-size: 13px;
+        font-style: normal;
+        font-weight: 400;        
+      }
+
+      .btn__filtrar {
+        background: #CFFA61;
+        color: #000;
+        border-radius: 7px;
+        text-align: center;
+        font-family: Sora;
+        font-size: 13px;
+        font-style: normal;
+        font-weight: 400;
+      }
+
+      .inputPesquisa {
+        background: #1C1C1C;
+        border-radius: 7px;
+
+        color: #888;
+        font-family: Sora;
+        font-size: 10px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 130%;
+      }
+
+      .deleteButton,.btn__editar {
+        background: #CFFA61;
+        color:  #000;
+        border: none;
+      }
+
+      .material-icons {
+        color:  #000;
+      }
+
+      .label__editar {
+        color: #BABABA;
+        font-family: Sora;
+        font-size: 12px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: normal;
+      }
+
+      .input__editar {
+        border-radius: 8px;
+        background: rgba(68, 68, 68, 0.25);
+        height: 42px;
+        border: none;
+        color: #888;
+
+        text-align: center;
+        font-family: Sora;
+        font-size: 10px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 130%;
+      }
+
+
+      .btn__salvar {
+          flex-shrink: 0;
+          border-radius: 7px;
+          background: #CFFA61;
+          color: #000;
+          text-align: center;
+          font-family: Sora;
+          font-size: 13px;
+          font-style: normal;
+          font-weight: 400;
+          height: 42px;
+          margin-top: 1rem;
+}
+      }
+    </style>
+      <div class="row" style="gap:8px;">
+        <div class="col-md-6 card card__contatos">
+          <div class="d-flex justify-content-between">         
+            <div class="d-flex" style="gap: 8px">
+              <input type="text" class="form-control inputPesquisa">
+              <button id="btnFiltrar" class="btn btn__filtrar">Filtrar</button>
+            </div>
+            <a href="/contacts" class="btn btn__adicionar">Adicionar</a>
+          </div>      
+          <table class="table container mt-3">
             <thead>
               <tr>
-                <th scope="col">#</th>
-                <th scope="col">Nome</th>
-                <th scope="col">Idade</th>
-                <th scope="col">Número</th>
-                <th scope="col">Ações</th>
+                <th scope="col" class="contato__th">#</th>
+                <th scope="col" class="contato__th">Nome</th>
+                <th scope="col" class="contato__th">Idade</th>
+                <th scope="col" class="contato__th">Número</th>
+                <th scope="col" class="contato__th">Ações</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody class="contato__tbody">
               ${tableRows}
             </tbody>
           </table>
         </div>
-        <div class="col-md-6">
-          <form id="editContactForm">
+        <div class="col-md-4 card card__editar">
+          <form id="editContactForm" class="d-flex flex-column" style="gap: 8px;">
           </form>
         </div>
         
@@ -150,16 +260,16 @@ async function loadContactDetails(contactId) {
     editContactForm.innerHTML = `
       <input type="text" id="editId" hidden value="${contact[0].contato_id}" required>
 
-      <label for="editName">Nome:</label>
-      <input type="text" id="editName" value="${contact[0].contato_nome}" required>
+      <label for="editName" class="label__editar">Nome:</label>
+      <input type="text" id="editName"  class="input__editar" value="${contact[0].contato_nome}" required>
 
-      <label for="editAge">Idade:</label>
-      <input type="text" id="editAge" value="${contact[0].contato_idade}" required>
+      <label for="editAge" class="label__editar">Idade:</label>
+      <input type="text" id="editAge" class="input__editar" value="${contact[0].contato_idade}" required>
 
-      <label for="editNumber">Número:</label>
-      <input type="text" id="editNumber" value="${contact[0].telefone_numero}" required>
+      <label for="editNumber" class="label__editar">Número:</label>
+      <input type="text" id="editNumber" class="input__editar" value="${contact[0].telefone_numero}" required>
 
-      <button type="submit">Salvar Edições</button>
+      <button type="submit" class="btn__salvar">Salvar Edições</button>
     `;
   } catch (error) {
     console.error('Erro ao carregar detalhes do contato:', error);
