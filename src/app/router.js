@@ -1,5 +1,3 @@
-// No arquivo router.js
-
 export class Router {
     constructor(routes, outletId) {
         this.routes = routes;

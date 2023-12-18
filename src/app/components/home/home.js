@@ -18,7 +18,6 @@ async function getContactById(id) {
   }
 }
 
-
 document.addEventListener('DOMContentLoaded', async function () {
   try {
     await HomeComponent();
@@ -30,7 +29,6 @@ document.addEventListener('DOMContentLoaded', async function () {
 
 document.addEventListener('submit', async function (event) {
   event.preventDefault();
-
   const editName = document.getElementById('editName').value;
   const editAge = document.getElementById('editAge').value;
   const editNumber = document.getElementById('editNumber').value;
@@ -48,7 +46,6 @@ export async function HomeComponent() {
    
     const contatosResponse  = await getContatos();
     const contatos = contatosResponse.flat();
-    console.log('Contatos recebidos:', contatos);
     const tableRows = contatos.map(contato => `
       <tr>
         <th scope="row">${contato.contato_id}</th>
@@ -234,6 +231,8 @@ export async function HomeComponent() {
         
       });
 
+    });
+
     const deleteButtons = appContainer.querySelectorAll('.deleteButton');
     deleteButtons.forEach(button => {
       button.addEventListener('click', async () => {
@@ -241,10 +240,11 @@ export async function HomeComponent() {
         console.log(button);
         console.log(contactId);
         await deleteContact(contactId);
+        await HomeComponent();
       })    
     });
 
-    });
+
 
 
     const btnFiltrar = document.getElementById('btnFiltrar');
@@ -267,10 +267,7 @@ export async function HomeComponent() {
 async function loadContactDetails(contactId) {
   try {
     const contact = await getContactById(contactId);
-    console.log('Contact:', contact[0]);
     const editContactForm = document.getElementById('editContactForm');
-
-    // Atualize o formulário de edição com os detalhes do contato
     editContactForm.innerHTML = `
       <input type="text" id="editId" hidden value="${contact[0].contato_id}" required>
 
@@ -332,26 +329,11 @@ async function deleteContact(id) {
 }
 }
 
-// document.addEventListener('DOMContentLoaded', async function () {
-//   try {
-//     await HomeComponent();
-
-//     const btnFiltrar = document.getElementById('btnFiltrar');
-//     btnFiltrar.addEventListener('click', async () => {
-//       const termoPesquisa = document.querySelector('.inputPesquisa').value;
-//       await filterContacts(termoPesquisa);
-//     });
-//   } catch (e) {
-//     console.error(e);
-//   }
-// });
-
-
 async function filterContacts(termo) {
   try {
     const contatosResponse = await fetch(`http://localhost:3000/contato/filter/${termo}`);
     const contatos = await contatosResponse.json();
-    console.log("AQUI ESTOU")
+    
     const tableRows = contatos.map(contato => `
       <tr>
         <th scope="row">${contato.contato_id}</th>
@@ -363,19 +345,43 @@ async function filterContacts(termo) {
             <span class="material-icons">delete</span>
           </button>
           <button class="btn btn-primary btn__editar" data-contact-id="${contato.contato_id}">
-            <a style="text-decoration: none; color: white;">
-              <span class="material-icons">edit</span>
-            </a>
-          </button>
+          <a style="text-decoration: none; color: white;">
+            <span class="material-icons">edit</span>
+          </a>
+        </button>
         </td>      
       </tr>
     `).join('');
 
     const tbody = document.querySelector('tbody');
-    tbody.innerHTML = tableRows;
+    tbody.innerHTML = tableRows;  
+
+    const editButtons = document.querySelectorAll('.btn-primary');
+    editButtons.forEach(button => {
+      button.addEventListener('click', async () => {
+        const contactId = button.getAttribute('data-contact-id');
+        await loadContactDetails(contactId);
+        
+      });
+
+    const deleteButtons = document.querySelectorAll('.deleteButton');
+    deleteButtons.forEach(button => {
+      button.addEventListener('click', async () => {
+        const contactId = button.getAttribute('data-contact-id');
+        console.log(button);
+        console.log(contactId);
+        await deleteContact(contactId);
+        await HomeComponent();
+      })    
+    });
+
+    });
+
   } catch (error) {
     console.error('Erro ao filtrar contatos:', error);
   }
+
+  
 }
 
 

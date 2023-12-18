@@ -1,13 +1,11 @@
 import { HomeComponent } from "../home/home.js";
 
 document.addEventListener('submit', async function (event) {
-    // Verificar se o evento ocorreu no formulário correto
     if (event.target.id === 'addContactForm') {
         event.preventDefault();
         const nome = document.getElementById('nome').value;
         const idade = document.getElementById('idade').value;
         const numero = document.getElementById('numero').value;
-
         await addContact(nome, idade, numero);
         await HomeComponent();
     }
